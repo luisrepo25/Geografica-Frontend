@@ -5,11 +5,14 @@
 /tmp
 /out-tsc
 /bazel-out
+.angular
 
 # Node
 /node_modules
 npm-debug.log
 yarn-error.log
+lerna-debug.log*
+.pnpm-debug.log*
 
 # IDEs and editors
 .idea/
@@ -19,6 +22,7 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+*.sublime-project
 
 # Visual Studio Code
 .vscode/*
@@ -38,6 +42,54 @@ testem.log
 /typings
 __screenshots__/
 
+# Documentation (no enviar al repositorio)
+/docs
+
 # System files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Testing
+/coverage
+/.nyc_output
+*.lcov
+
+# Optional npm cache
+.npm
+.eslintcache
+.stylelintcache
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Build artifacts
+/build
+
+# Package manager lock files (uncomment if needed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

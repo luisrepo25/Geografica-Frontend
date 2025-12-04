@@ -1,0 +1,200 @@
+<div class="max-w-3xl mx-auto p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <button (click)="goBack()" class="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors mb-4">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span>Volver</span>
+    </button>
+    <h1 class="text-3xl font-bold text-gray-800">Registrar Nuevo Hijo</h1>
+    <p class="text-gray-600 mt-2">Complete la información del hijo para generar su código de vinculación</p>
+  </div>
+
+  <!-- Alert de Error -->
+  <div *ngIf="errorMessage()" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <p class="text-sm text-red-700">{{ errorMessage() }}</p>
+    </div>
+  </div>
+
+  <!-- Modal de Código -->
+  <div *ngIf="showCodeModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl transform transition-all">
+      <div class="text-center">
+        <!-- Success Icon -->
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Hijo Registrado!</h2>
+        <p class="text-gray-600 mb-6">Guarda este código de vinculación</p>
+
+        <!-- Código -->
+        <div class="bg-gradient-to-r from-primary to-primary-600 rounded-xl p-6 mb-6">
+          <p class="text-sm text-white text-opacity-90 mb-2">Código de Vinculación</p>
+          <p class="text-4xl font-bold text-white tracking-widest">{{ vinculationCode() }}</p>
+        </div>
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div class="flex items-start gap-2">
+            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-sm text-yellow-800">El hijo debe usar este código en su aplicación móvil para vincular su dispositivo.</p>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="space-y-2">
+          <button (click)="copyCode()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <span>{{ codeCopied() ? '¡Copiado!' : 'Copiar Código' }}</span>
+          </button>
+
+          <button (click)="closeModal()" class="w-full px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <app-card [padding]="true">
+    <form [formGroup]="childForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- Información Personal -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Información Personal</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <app-input
+            label="Nombre"
+            type="text"
+            placeholder="Nombre del hijo"
+            formControlName="nombre"
+            [required]="true"
+            [error]="getFieldError('nombre')"
+          />
+
+          <app-input
+            label="Apellido"
+            type="text"
+            placeholder="Apellido del hijo"
+            formControlName="apellido"
+            [error]="getFieldError('apellido')"
+          />
+        </div>
+      </div>
+
+      <!-- Información de Contacto -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Información de Contacto</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <app-input
+            label="Email Temporal"
+            type="email"
+            placeholder="email@temporal.com"
+            formControlName="email"
+            [required]="true"
+            [error]="getFieldError('email')"
+          >
+            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </app-input>
+
+          <app-input
+            label="Teléfono"
+            type="tel"
+            placeholder="555-1234"
+            formControlName="telefono"
+            [error]="getFieldError('telefono')"
+          >
+            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+            </svg>
+          </app-input>
+        </div>
+
+        <div class="mt-4">
+          <app-input
+            label="Contraseña Temporal"
+            type="password"
+            placeholder="Mínimo 6 caracteres"
+            formControlName="password"
+            [required]="true"
+            [error]="getFieldError('password')"
+          >
+            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </app-input>
+          <p class="text-xs text-gray-500 mt-1">Esta contraseña es temporal hasta que el hijo vincule su dispositivo</p>
+        </div>
+      </div>
+
+      <!-- Ubicación Inicial (Opcional) -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Ubicación Inicial (Opcional)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <app-input
+            label="Latitud"
+            type="number"
+            placeholder="-17.783327"
+            formControlName="latitud"
+            [error]="getFieldError('latitud')"
+          >
+            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </app-input>
+
+          <app-input
+            label="Longitud"
+            type="number"
+            placeholder="-63.182140"
+            formControlName="longitud"
+            [error]="getFieldError('longitud')"
+          >
+            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </app-input>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">Puedes dejar esto vacío. La ubicación se actualizará cuando el hijo use la app móvil.</p>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-4 pt-4">
+        <button
+          type="button"
+          (click)="goBack()"
+          class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="loading() || !childForm.valid"
+          class="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg *ngIf="loading()" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{{ loading() ? 'Registrando...' : 'Registrar Hijo' }}</span>
+        </button>
+      </div>
+    </form>
+  </app-card>
+</div>

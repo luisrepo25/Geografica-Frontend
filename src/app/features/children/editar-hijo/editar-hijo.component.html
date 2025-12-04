@@ -1,0 +1,189 @@
+<div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Editar Hijo</h1>
+    <p class="mt-1 text-sm text-gray-600">Modifica la información de tu hijo</p>
+  </div>
+
+  @if (loadingChild) {
+    <app-card>
+      <div class="animate-pulse">
+        <div class="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+        <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+      </div>
+    </app-card>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <app-card>
+        <div class="space-y-6">
+          <!-- Nombre -->
+          <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">
+              Nombre <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              formControlName="nombre"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+              placeholder="Ej: Juan Carlos"
+            />
+            @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+              <p class="mt-1 text-sm text-red-600">
+                @if (form.get('nombre')?.errors?.['required']) {
+                  El nombre es requerido
+                }
+                @if (form.get('nombre')?.errors?.['minlength']) {
+                  El nombre debe tener al menos 3 caracteres
+                }
+              </p>
+            }
+          </div>
+
+          <!-- Apellido -->
+          <div>
+            <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">
+              Apellido
+            </label>
+            <input
+              type="text"
+              id="apellido"
+              formControlName="apellido"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+              placeholder="Ej: García López"
+            />
+            @if (form.get('apellido')?.invalid && form.get('apellido')?.touched) {
+              <p class="mt-1 text-sm text-red-600">
+                El apellido debe tener al menos 2 caracteres
+              </p>
+            }
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">
+              Teléfono
+            </label>
+            <input
+              type="tel"
+              id="telefono"
+              formControlName="telefono"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+              placeholder="Ej: 555-1234"
+            />
+            @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
+              <p class="mt-1 text-sm text-red-600">
+                El teléfono debe tener al menos 7 caracteres
+              </p>
+            }
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
+              placeholder="Ej: hijo@email.com"
+            />
+            @if (child.vinculado) {
+              <p class="mt-1 text-sm text-gray-500">
+                🔒 No se puede cambiar el email de un hijo ya vinculado
+              </p>
+            }
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+              <p class="mt-1 text-sm text-red-600">
+                @if (form.get('email')?.errors?.['required']) {
+                  El email es requerido
+                }
+                @if (form.get('email')?.errors?.['email']) {
+                  Ingresa un email válido
+                }
+              </p>
+            }
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+              Nueva Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+              placeholder="Dejar vacío para mantener la actual"
+            />
+            @if (form.get('password')?.invalid && form.get('password')?.touched) {
+              <p class="mt-1 text-sm text-red-600">
+                La contraseña debe tener al menos 6 caracteres
+              </p>
+            }
+            <p class="mt-1 text-sm text-gray-500">
+              Solo completa este campo si deseas cambiar la contraseña
+            </p>
+          </div>
+
+          <!-- Estado de vinculación -->
+          <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                @if (child.vinculado) {
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                } @else {
+                  <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                  </svg>
+                }
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium" [class.text-green-800]="child.vinculado" [class.text-yellow-800]="!child.vinculado">
+                  @if (child.vinculado) {
+                    Dispositivo Vinculado
+                  } @else {
+                    Pendiente de Vinculación
+                  }
+                </h3>
+                <div class="mt-2 text-sm" [class.text-green-700]="child.vinculado" [class.text-yellow-700]="!child.vinculado">
+                  @if (child.vinculado) {
+                    <p>Este hijo ya ha vinculado su dispositivo móvil.</p>
+                  } @else {
+                    <p>Código de vinculación: <strong class="font-mono text-lg">{{ child.codigoVinculacion }}</strong></p>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+          <app-button
+            type="button"
+            variant="secondary"
+            (click)="cancel()"
+            [disabled]="loading"
+          >
+            Cancelar
+          </app-button>
+          
+          <app-button
+            type="submit"
+            variant="primary"
+            [loading]="loading"
+            [disabled]="form.invalid || loading"
+          >
+            {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+          </app-button>
+        </div>
+      </app-card>
+    </form>
+  }
+</div>

@@ -18,6 +18,9 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "allowedCommonJsDependencies": [
+              "leaflet"
+            ],
             "assets": [
               {
                 "glob": "**/*",
@@ -25,7 +28,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/leaflet/dist/leaflet.css"
             ]
           },
           "configurations": {

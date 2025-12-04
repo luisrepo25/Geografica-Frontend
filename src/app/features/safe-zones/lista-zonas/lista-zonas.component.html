@@ -1,0 +1,120 @@
+<div class="max-w-7xl mx-auto p-6">
+  <!-- Header -->
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Zonas Seguras</h1>
+      <p class="text-gray-600 mt-1">Gestiona las zonas de seguridad para tus niños</p>
+    </div>
+    <app-button (click)="createZone()">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Nueva Zona
+    </app-button>
+  </div>
+
+  <!-- Error Message -->
+  @if (error) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-sm text-red-600">{{ error }}</p>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (i of [1,2,3]; track i) {
+        <app-card>
+          <div class="animate-pulse">
+            <div class="h-48 bg-gray-200 rounded-lg mb-4"></div>
+            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </app-card>
+      }
+    </div>
+  } @else if (safeZones.length === 0) {
+    <!-- Empty State -->
+    <app-card>
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No hay zonas seguras definidas</h3>
+        <p class="text-gray-500 mb-6">Define áreas donde tus niños pueden moverse libremente</p>
+        <app-button (click)="createZone()">
+          Crear Primera Zona
+        </app-button>
+      </div>
+    </app-card>
+  } @else {
+    <!-- Safe Zones Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (zone of safeZones; track zone.id) {
+        <app-card [padding]="false">
+          <!-- Map Preview -->
+          <div class="relative h-48 bg-gray-100 rounded-t-lg overflow-hidden">
+            <iframe
+              [src]="getMapPreviewUrl(zone) | sanitize: 'resourceUrl'"
+              class="w-full h-full pointer-events-none"
+              frameborder="0"
+              scrolling="no"
+            ></iframe>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          </div>
+
+          <div class="p-4">
+            <!-- Title & Description -->
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ zone.nombre }}</h3>
+            @if (zone.descripcion) {
+              <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ zone.descripcion }}</p>
+            }
+
+            <!-- Children Count -->
+            <div class="flex items-center text-sm text-gray-600 mb-4">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <span>{{ zone.hijos.length }} {{ zone.hijos.length === 1 ? 'niño asignado' : 'niños asignados' }}</span>
+            </div>
+
+            <!-- Children List -->
+            @if (zone.hijos.length > 0) {
+              <div class="mb-4">
+                <div class="flex flex-wrap gap-2">
+                  @for (child of zone.hijos; track child.id) {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {{ child.nombre }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Date -->
+            <p class="text-xs text-gray-500 mb-4">
+              Creada el {{ zone.fechaCreacion | date:'dd/MM/yyyy' }}
+            </p>
+
+            <!-- Actions -->
+            <div class="flex gap-2">
+              <button
+                (click)="editZone(zone.id)"
+                class="flex-1 px-3 py-2 text-sm font-medium text-primary bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                Editar
+              </button>
+              <button
+                (click)="deleteZone(zone)"
+                [disabled]="deletingId === zone.id"
+                class="flex-1 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+              >
+                {{ deletingId === zone.id ? 'Eliminando...' : 'Eliminar' }}
+              </button>
+            </div>
+          </div>
+        </app-card>
+      }
+    </div>
+  }
+</div>
