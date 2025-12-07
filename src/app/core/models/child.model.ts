@@ -2,7 +2,7 @@ export interface Child {
   id: number;
   nombre: string;
   apellido?: string;
-  email: string;
+  email: string;          // ⚠️ Email temporal generado por backend - NO mostrar al usuario
   telefono?: string;
   latitud?: number | null;
   longitud?: number | null;
@@ -15,11 +15,10 @@ export interface Child {
 }
 
 export interface RegisterChildRequest {
-  nombre: string;
-  apellido?: string;
-  email: string;
-  password: string;
-  telefono?: string;
+  nombre: string;         // REQUERIDO, min 3 caracteres
+  apellido?: string;      // OPCIONAL, min 2 caracteres si se envía
+  telefono?: string;      // OPCIONAL, min 7 caracteres si se envía
+  // ⚠️ NO ENVIAR email ni password - backend los genera automáticamente
 }
 
 export interface RegisterChildResponse extends Child {

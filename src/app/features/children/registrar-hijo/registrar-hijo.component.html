@@ -50,25 +50,12 @@
 
       <!-- Información de Contacto -->
       <div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Información de Contacto</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <app-input
-            label="Email Temporal"
-            type="email"
-            placeholder="email@temporal.com"
-            formControlName="email"
-            [required]="true"
-            [error]="getFieldError('email')"
-          >
-            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
-          </app-input>
-
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Información de Contacto (Opcional)</h3>
+        <div class="grid grid-cols-1 gap-4">
           <app-input
             label="Teléfono"
             type="tel"
-            placeholder="555-1234"
+            placeholder="987654321"
             formControlName="telefono"
             [error]="getFieldError('telefono')"
           >
@@ -77,21 +64,20 @@
             </svg>
           </app-input>
         </div>
+      </div>
 
-        <div class="mt-4">
-          <app-input
-            label="Contraseña Temporal"
-            type="password"
-            placeholder="Mínimo 6 caracteres"
-            formControlName="password"
-            [required]="true"
-            [error]="getFieldError('password')"
-          >
-            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-          </app-input>
-          <p class="text-xs text-gray-500 mt-1">Esta contraseña es temporal hasta que el hijo vincule su dispositivo</p>
+      <!-- Nota importante sobre acceso del hijo -->
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <p class="text-sm text-yellow-800 font-medium">🔐 Acceso del hijo</p>
+            <p class="text-xs text-yellow-700 mt-1">
+              El sistema generará automáticamente un <strong>código de 6 caracteres</strong> que el hijo usará para acceder a la aplicación móvil. No necesitas proporcionar email ni contraseña.
+            </p>
+          </div>
         </div>
       </div>
 

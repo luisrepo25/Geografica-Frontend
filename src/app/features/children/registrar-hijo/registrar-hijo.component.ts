@@ -25,19 +25,15 @@ export class RegistrarHijoComponent {
   childForm: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     apellido: ['', [Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
     telefono: ['', [Validators.minLength(7)]]
+    // ⚠️ NO incluir email ni password - backend los genera automáticamente
   });
 
   getFieldError(field: string): string {
     const control = this.childForm.get(field);
     if (control?.invalid && (control?.dirty || control?.touched)) {
       if (control.errors?.['required']) return 'Este campo es requerido';
-      if (control.errors?.['email']) return 'Email inválido';
       if (control.errors?.['minlength']) return `Mínimo ${control.errors?.['minlength'].requiredLength} caracteres`;
-      if (control.errors?.['min']) return `Valor mínimo: ${control.errors?.['min'].min}`;
-      if (control.errors?.['max']) return `Valor máximo: ${control.errors?.['max'].max}`;
     }
     return '';
   }
@@ -77,7 +73,7 @@ export class RegistrarHijoComponent {
               </div>
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
                 <p class="text-xs text-blue-800">
-                  <strong>Importante:</strong> Comparte este código con tu hijo para que pueda acceder a la aplicación móvil.
+                  <strong>Importante:</strong> Tu hijo usará <strong>SOLO este código</strong> para acceder a la aplicación móvil. No necesita email ni contraseña, solo el código de 6 caracteres.
                 </p>
               </div>
             </div>
