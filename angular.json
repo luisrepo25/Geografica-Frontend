@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "de573d95-b597-483d-912f-eafa7b2c5503"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -19,7 +20,8 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
-              "leaflet"
+              "leaflet",
+              "socket.io-client"
             ],
             "assets": [
               {

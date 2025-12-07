@@ -9,6 +9,9 @@ export interface Child {
   vinculado: boolean;
   codigoVinculacion: string; // ⭐ Siempre presente (necesario para regenerar incluso si vinculado = true)
   ultimaconexion?: string | null;
+  // Live tracking fields
+  battery?: number;
+  status?: 'online' | 'offline';
 }
 
 export interface RegisterChildRequest {
