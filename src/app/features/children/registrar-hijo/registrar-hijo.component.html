@@ -21,52 +21,6 @@
     </div>
   </div>
 
-  <!-- Modal de Código -->
-  <div *ngIf="showCodeModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl transform transition-all">
-      <div class="text-center">
-        <!-- Success Icon -->
-        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </div>
-
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Hijo Registrado!</h2>
-        <p class="text-gray-600 mb-6">Guarda este código de vinculación</p>
-
-        <!-- Código -->
-        <div class="bg-gradient-to-r from-primary to-primary-600 rounded-xl p-6 mb-6">
-          <p class="text-sm text-white text-opacity-90 mb-2">Código de Vinculación</p>
-          <p class="text-4xl font-bold text-white tracking-widest">{{ vinculationCode() }}</p>
-        </div>
-
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <div class="flex items-start gap-2">
-            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-            <p class="text-sm text-yellow-800">El hijo debe usar este código en su aplicación móvil para vincular su dispositivo.</p>
-          </div>
-        </div>
-
-        <!-- Botones -->
-        <div class="space-y-2">
-          <button (click)="copyCode()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-            <span>{{ codeCopied() ? '¡Copiado!' : 'Copiar Código' }}</span>
-          </button>
-
-          <button (click)="closeModal()" class="w-full px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors">
-            Aceptar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Formulario -->
   <app-card [padding]="true">
     <form [formGroup]="childForm" (ngSubmit)="onSubmit()" class="space-y-6">
@@ -141,37 +95,19 @@
         </div>
       </div>
 
-      <!-- Ubicación Inicial (Opcional) -->
-      <div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Ubicación Inicial (Opcional)</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <app-input
-            label="Latitud"
-            type="number"
-            placeholder="-17.783327"
-            formControlName="latitud"
-            [error]="getFieldError('latitud')"
-          >
-            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-          </app-input>
-
-          <app-input
-            label="Longitud"
-            type="number"
-            placeholder="-63.182140"
-            formControlName="longitud"
-            [error]="getFieldError('longitud')"
-          >
-            <svg icon class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-          </app-input>
+      <!-- Nota importante sobre ubicación -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+          <div>
+            <p class="text-sm text-blue-800 font-medium">📍 Ubicación del hijo</p>
+            <p class="text-xs text-blue-700 mt-1">
+              La ubicación se actualizará automáticamente cuando el hijo use la aplicación móvil. No es necesario ingresarla manualmente.
+            </p>
+          </div>
         </div>
-        <p class="text-xs text-gray-500 mt-2">Puedes dejar esto vacío. La ubicación se actualizará cuando el hijo use la app móvil.</p>
       </div>
 
       <!-- Botones -->

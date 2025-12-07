@@ -7,7 +7,7 @@ export interface Child {
   latitud?: number | null;
   longitud?: number | null;
   vinculado: boolean;
-  codigoVinculacion?: string; // Solo presente si vinculado es false
+  codigoVinculacion: string; // ⭐ Siempre presente (necesario para regenerar incluso si vinculado = true)
   ultimaconexion?: string | null;
 }
 
@@ -17,8 +17,6 @@ export interface RegisterChildRequest {
   email: string;
   password: string;
   telefono?: string;
-  latitud?: number;
-  longitud?: number;
 }
 
 export interface RegisterChildResponse extends Child {

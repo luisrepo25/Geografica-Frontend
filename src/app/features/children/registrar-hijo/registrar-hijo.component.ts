@@ -6,6 +6,7 @@ import { CardComponent } from '../../../shared/components/card/card.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { ChildService } from '../../../core/services/child.service';
 import { RegisterChildResponse } from '../../../core/models/child.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-registrar-hijo',
@@ -20,18 +21,13 @@ export class RegistrarHijoComponent {
 
   loading = signal(false);
   errorMessage = signal('');
-  showCodeModal = signal(false);
-  vinculationCode = signal('');
-  codeCopied = signal(false);
 
   childForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required]],
-    apellido: [''],
+    nombre: ['', [Validators.required, Validators.minLength(3)]],
+    apellido: ['', [Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    telefono: [''],
-    latitud: ['', [Validators.min(-90), Validators.max(90)]],
-    longitud: ['', [Validators.min(-180), Validators.max(180)]]
+    telefono: ['', [Validators.minLength(7)]]
   });
 
   getFieldError(field: string): string {
@@ -60,47 +56,74 @@ export class RegistrarHijoComponent {
     const formData = { ...this.childForm.value };
     
     // Convertir valores vacíos a undefined
-    if (!formData.apellido) delete formData.apellido;
-    if (!formData.telefono) delete formData.telefono;
-    if (!formData.latitud || formData.latitud === '') delete formData.latitud;
-    if (!formData.longitud || formData.longitud === '') delete formData.longitud;
-    
-    // Convertir a números si existen
-    if (formData.latitud) formData.latitud = parseFloat(formData.latitud);
-    if (formData.longitud) formData.longitud = parseFloat(formData.longitud);
+    if (!formData.apellido || formData.apellido.trim() === '') delete formData.apellido;
+    if (!formData.telefono || formData.telefono.trim() === '') delete formData.telefono;
 
     this.childService.registerChild(formData).subscribe({
       next: (response: RegisterChildResponse) => {
         this.loading.set(false);
-        this.vinculationCode.set(response.codigoVinculacion);
-        this.showCodeModal.set(true);
+        
+        // Mostrar código de vinculación con SweetAlert2
+        Swal.fire({
+          title: '¡Hijo Registrado! 🎉',
+          html: `
+            <div class="text-left space-y-4">
+              <p class="text-gray-700 mb-4">El hijo <strong>${response.nombre}</strong> ha sido registrado exitosamente.</p>
+              <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+                <p class="text-sm text-yellow-800 font-semibold mb-2">📱 Código de Vinculación:</p>
+                <div class="bg-white rounded px-4 py-3 border border-yellow-200">
+                  <code class="text-2xl font-bold text-yellow-900 tracking-widest">${response.codigoVinculacion}</code>
+                </div>
+              </div>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+                <p class="text-xs text-blue-800">
+                  <strong>Importante:</strong> Comparte este código con tu hijo para que pueda acceder a la aplicación móvil.
+                </p>
+              </div>
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonText: 'Copiar Código',
+          confirmButtonColor: '#1E5BFF',
+          showCancelButton: true,
+          cancelButtonText: 'Cerrar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigator.clipboard.writeText(response.codigoVinculacion);
+            Swal.fire({
+              title: '¡Copiado!',
+              text: 'El código ha sido copiado al portapapeles',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
+          this.router.navigate(['/children']);
+        });
       },
       error: (error) => {
         this.loading.set(false);
+        let errorMessage = 'Error al registrar hijo. Intenta de nuevo.';
+        
         if (error.status === 409) {
-          this.errorMessage.set('El email ya está registrado');
-        } else if (error.error?.message) {
+          errorMessage = 'El email ya está registrado. Por favor usa otro email.';
+        } else if (error.status === 400 && error.error?.message) {
           if (Array.isArray(error.error.message)) {
-            this.errorMessage.set(error.error.message.join(', '));
+            errorMessage = error.error.message.join(', ');
           } else {
-            this.errorMessage.set(error.error.message);
+            errorMessage = error.error.message;
           }
-        } else {
-          this.errorMessage.set('Error al registrar hijo. Intenta de nuevo.');
         }
+        
+        Swal.fire({
+          title: 'Error',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#1E5BFF'
+        });
       }
     });
-  }
-
-  copyCode(): void {
-    navigator.clipboard.writeText(this.vinculationCode());
-    this.codeCopied.set(true);
-    setTimeout(() => this.codeCopied.set(false), 2000);
-  }
-
-  closeModal(): void {
-    this.showCodeModal.set(false);
-    this.router.navigate(['/children']);
   }
 
   goBack(): void {

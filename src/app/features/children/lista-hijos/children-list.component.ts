@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { ChildService } from '../../../core/services/child.service';
 import { Child } from '../../../core/models/child.model';
+import Swal from 'sweetalert2';
 
 
 
@@ -72,33 +73,114 @@ export class ChildrenListComponent implements OnInit {
 
   copyCode(code: string): void {
     navigator.clipboard.writeText(code);
-    // Podrías agregar un toast notification aquí
+    Swal.fire({
+      title: '¡Copiado!',
+      text: 'El código ha sido copiado al portapapeles',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end'
+    });
   }
 
   regenerateCode(childId: number): void {
-    this.regeneratingId.set(childId);
-    
-    this.childService.regenerateCode(childId).subscribe({
-      next: (response) => {
-        // Actualizar el código en la lista
-        this.children.update(children => 
-          children.map(child => 
-            child.id === childId 
-              ? { ...child, codigoVinculacion: response.codigoVinculacion }
-              : child
-          )
-        );
-        this.regeneratingId.set(null);
-      },
-      error: (error) => {
-        this.regeneratingId.set(null);
-        if (error.status === 409) {
-          this.errorMessage.set('Este hijo ya está vinculado');
-        } else {
-          this.errorMessage.set('Error al regenerar código');
+    // Confirmación antes de regenerar
+    Swal.fire({
+      title: '¿Regenerar Código?',
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-3">El código actual quedará inválido y se generará uno nuevo.</p>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <p class="text-sm text-yellow-800">
+              <strong>Importante:</strong> El estado de vinculación se reseteará y el hijo deberá ingresar nuevamente con el nuevo código.
+            </p>
+          </div>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, regenerar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#1E5BFF',
+      cancelButtonColor: '#6B7280'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      
+      this.regeneratingId.set(childId);
+      
+      this.childService.regenerateCode(childId).subscribe({
+        next: (response) => {
+          // Actualizar el hijo en la lista con vinculado = false
+          this.children.update(children => 
+            children.map(child => 
+              child.id === childId 
+                ? { 
+                    ...child, 
+                    codigoVinculacion: response.codigoVinculacion,
+                    vinculado: false  // ⭐ Resetear vinculado
+                  }
+                : child
+            )
+          );
+          this.regeneratingId.set(null);
+          
+          // Mostrar el nuevo código
+          Swal.fire({
+            title: '¡Código Regenerado! 🔄',
+            html: `
+              <div class="text-left space-y-4">
+                <p class="text-gray-700 mb-4">Se ha generado un nuevo código de vinculación.</p>
+                <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+                  <p class="text-sm text-yellow-800 font-semibold mb-2">📱 Nuevo Código:</p>
+                  <div class="bg-white rounded px-4 py-3 border border-yellow-200">
+                    <code class="text-2xl font-bold text-yellow-900 tracking-widest">${response.codigoVinculacion}</code>
+                  </div>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p class="text-xs text-blue-800">
+                    <strong>Nota:</strong> Comparte este código con tu hijo para que pueda acceder nuevamente a la aplicación móvil.
+                  </p>
+                </div>
+              </div>
+            `,
+            icon: 'success',
+            confirmButtonText: 'Copiar Código',
+            confirmButtonColor: '#1E5BFF',
+            showCancelButton: true,
+            cancelButtonText: 'Cerrar'
+          }).then((copyResult) => {
+            if (copyResult.isConfirmed) {
+              navigator.clipboard.writeText(response.codigoVinculacion);
+              Swal.fire({
+                title: '¡Copiado!',
+                text: 'El código ha sido copiado al portapapeles',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            }
+          });
+        },
+        error: (error) => {
+          this.regeneratingId.set(null);
+          let errorMessage = 'Error al regenerar código';
+          
+          if (error.status === 401) {
+            errorMessage = 'No tienes permisos para regenerar el código de este hijo';
+          } else if (error.status === 404) {
+            errorMessage = 'Hijo no encontrado';
+          }
+          
+          Swal.fire({
+            title: 'Error',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#1E5BFF'
+          });
         }
-        setTimeout(() => this.errorMessage.set(''), 3000);
-      }
+      });
     });
   }
 }
