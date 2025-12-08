@@ -1,0 +1,29 @@
+# Configuración de Netlify para SafeSteps Frontend
+[build]
+  # Comando para construir el proyecto
+  command = "npm run build"
+  
+  # Directorio donde están los archivos compilados
+  publish = "dist/safesteps/browser"
+
+# Variables de entorno para el build
+[build.environment]
+  # Estas se usan durante "npm run build" en Netlify
+  NODE_VERSION = "20"
+  NPM_VERSION = "10"
+
+# Configuración para SPA (Single Page Application)
+# Redirige todas las rutas al index.html para que Angular Router funcione
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de seguridad (opcional pero recomendado)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
