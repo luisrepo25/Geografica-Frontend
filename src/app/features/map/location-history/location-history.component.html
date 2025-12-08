@@ -1,0 +1,219 @@
+<div class="p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        Historial de Ubicaciones
+        @if (child()) {
+          <span class="text-blue-600">- {{ child()!.nombre }} {{ child()!.apellido || '' }}</span>
+        }
+      </h1>
+      <p class="text-gray-600 mt-1">Revisa el recorrido histórico de tu hijo</p>
+    </div>
+    <div class="flex gap-2">
+      <button 
+        (click)="refreshHistory()" 
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        [disabled]="loading()">
+        <span>🔄</span>
+        <span>Actualizar</span>
+      </button>
+      <button 
+        (click)="playRouteAnimation()" 
+        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+        [disabled]="loading() || records().length === 0">
+        <span>▶️</span>
+        <span>Reproducir</span>
+      </button>
+      <button 
+        (click)="exportToCSV()" 
+        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+        [disabled]="loading() || records().length === 0">
+        <span>📥</span>
+        <span>Exportar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <div class="flex flex-wrap gap-4 items-end">
+      <!-- Date Range Selector -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Rango de Fechas
+        </label>
+        <select 
+          [value]="selectedDateRange()"
+          (change)="onDateRangeChange($any($event.target).value)"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          @for (option of dateRangeOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Custom Date Range (only shown when custom is selected) -->
+      @if (selectedDateRange() === 'custom') {
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Fecha Inicio
+          </label>
+          <input 
+            type="datetime-local"
+            [value]="customStartDate()"
+            (change)="customStartDate.set($any($event.target).value); onCustomDateChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Fecha Fin
+          </label>
+          <input 
+            type="datetime-local"
+            [value]="customEndDate()"
+            (change)="customEndDate.set($any($event.target).value); onCustomDateChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  @if (stats()) {
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <!-- Total Records -->
+      <app-card>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600">{{ stats()!.totalRecords }}</div>
+          <div class="text-sm text-gray-600 mt-1">Registros Totales</div>
+        </div>
+      </app-card>
+
+      <!-- Distance -->
+      <app-card>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600">{{ formatDistance(stats()!.distance) }}</div>
+          <div class="text-sm text-gray-600 mt-1">Distancia Recorrida</div>
+        </div>
+      </app-card>
+
+      <!-- Online Records -->
+      <app-card>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-emerald-600">{{ stats()!.onlineRecords }}</div>
+          <div class="text-sm text-gray-600 mt-1">Registros Online</div>
+        </div>
+      </app-card>
+
+      <!-- Offline Records -->
+      <app-card>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-orange-600">{{ stats()!.offlineRecords }}</div>
+          <div class="text-sm text-gray-600 mt-1">
+            Registros Offline ({{ getOfflinePercentage() }}%)
+          </div>
+        </div>
+      </app-card>
+    </div>
+  }
+
+  <!-- Map -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+    <div class="h-[500px] relative">
+      @if (loading()) {
+        <div class="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+          <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Cargando historial...</p>
+          </div>
+        </div>
+      }
+      
+      @if (!loading() && records().length === 0) {
+        <div class="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+          <div class="text-center">
+            <div class="text-6xl mb-4">📍</div>
+            <p class="text-xl font-semibold text-gray-700 mb-2">Sin registros</p>
+            <p class="text-gray-600">No hay registros de ubicación para el período seleccionado</p>
+          </div>
+        </div>
+      }
+      
+      <div id="historyMap" class="w-full h-full"></div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  @if (records().length > 0) {
+    <div class="bg-white rounded-lg shadow-sm p-4">
+      <h3 class="text-sm font-semibold text-gray-700 mb-3">Leyenda</h3>
+      <div class="flex flex-wrap gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-green-500"></div>
+          <span class="text-sm text-gray-600">Punto de Inicio</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-red-500"></div>
+          <span class="text-sm text-gray-600">Punto Final</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-1 bg-blue-500"></div>
+          <span class="text-sm text-gray-600">Ruta Recorrida</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">✅</span>
+          <span class="text-sm text-gray-600">Registro Online</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">⚠️</span>
+          <span class="text-sm text-gray-600">Registro Offline</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Records List (Collapsible) -->
+  @if (records().length > 0) {
+    <details class="bg-white rounded-lg shadow-sm p-4 mt-6">
+      <summary class="cursor-pointer font-semibold text-gray-700 select-none">
+        Ver lista detallada de registros ({{ records().length }})
+      </summary>
+      <div class="mt-4 max-h-96 overflow-y-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50 sticky top-0">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha/Hora</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coordenadas</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (record of records(); track record.id) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  {{ formatDate(record.hora) }}
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600 font-mono">
+                  {{ record.latitud.toFixed(6) }}, {{ record.longitud.toFixed(6) }}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                  @if (record.fueOffline) {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                      ⚠️ Offline
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      ✅ Online
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </details>
+  }
+</div>

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.safesteps.com' // Cambia esto por tu URL de producción
+  apiUrl: 'http://18.220.15.227:3000'  // Backend en AWS (producción)
 };

@@ -64,6 +64,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/map/live-map.component').then(m => m.LiveMapComponent)
       },
       {
+        path: 'location-history/:id',
+        loadComponent: () => import('./features/map/location-history/location-history.component').then(m => m.LocationHistoryComponent)
+      },
+      {
         path: 'notifications',
         loadComponent: () => import('./features/notifications/notifications-list.component').then(m => m.NotificationsListComponent)
       },

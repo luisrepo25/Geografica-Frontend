@@ -21,7 +21,8 @@
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
               "leaflet",
-              "socket.io-client"
+              "socket.io-client",
+              "sweetalert2"
             ],
             "assets": [
               {
