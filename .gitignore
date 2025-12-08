@@ -14,6 +14,9 @@ yarn-error.log
 lerna-debug.log*
 .pnpm-debug.log*
 
+# Docker environment (no subir credenciales)
+.env.docker
+
 # IDEs and editors
 .idea/
 .project

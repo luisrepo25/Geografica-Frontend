@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Cambia esta URL a tu backend
+        API_URL: ${API_URL:-http://localhost:3000}
+    container_name: safesteps-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    restart: unless-stopped
+    networks:
+      - safesteps-network
+
+networks:
+  safesteps-network:
+    driver: bridge

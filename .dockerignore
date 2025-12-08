@@ -1,0 +1,14 @@
+# Docker
+.env.docker
+node_modules
+dist
+.angular
+npm-debug.log
+yarn-error.log
+.git
+.gitignore
+README.md
+*.md
+.vscode
+.idea
+*.log
